@@ -21,3 +21,5 @@ backend/build/
 
 .DS_Store
 Thumbs.db
+
+.idea/
