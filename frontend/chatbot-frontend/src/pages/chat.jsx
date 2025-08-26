@@ -10,7 +10,6 @@ function Chat() {
   const email = localStorage.getItem("email");
   const messagesEndRef = useRef(null);
 
- 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -23,16 +22,19 @@ function Chat() {
     const socket = new WebSocket(`ws://127.0.0.1:8000/ws?token=${token}`);
 
     socket.onopen = () => console.log("WebSocket connected");
+    
     socket.onclose = () => console.log("WebSocket disconnected");
 
     socket.onmessage = (e) => {
       try {
         const msg = JSON.parse(e.data);
-       
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === msg.data.id)) return prev;
-          return [...prev, msg.data];
-        });
+        if (msg.type === "message" && msg.data) {
+          setMessages((prev) => {
+            
+            if (prev.some((m) => m.id === msg.data.id)) return prev;
+            return [...prev, msg.data];
+          });
+        }
       } catch (err) {
         console.error("Error parsing WebSocket message:", err);
       }
@@ -46,20 +48,13 @@ function Chat() {
     if (!recipient || !text) return alert("Enter recipient and message");
 
     try {
-     
-      const tempMsg = {
-        id: Date.now().toString(), 
-        sender: email,
-        recipient,
-        content: text,
-        timestamp: new Date().toISOString(),
-      };
-      setMessages((prev) => [...prev, tempMsg]);
-      setText("");
+      
+      
+      setText(""); 
 
       await axios.post(
         "http://127.0.0.1:8000/messages",
-        { recipient, content: tempMsg.content },
+        { recipient, content: text },
         { headers: { Authorization: `Bearer ${token}` } }
       );
     } catch (err) {
@@ -101,6 +96,7 @@ function Chat() {
           placeholder="Message"
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
           style={{ marginRight: "10px", width: "300px" }}
         />
         <button onClick={sendMessage}>Send</button>
@@ -119,6 +115,8 @@ function Chat() {
         {messages.map((m, i) => (
           <p key={m.id || i}>
             <b>{m.sender === email ? "You" : m.sender}</b>: {m.content}
+            <br />
+           
           </p>
         ))}
         <div ref={messagesEndRef} />
