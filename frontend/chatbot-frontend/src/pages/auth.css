@@ -1,0 +1,115 @@
+.auth-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f2f5f7;
+}
+
+.auth-card {
+  width: 400px;
+  padding: 30px;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.1);
+}
+
+.app-brand {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.app-logo {
+  font-size: 40px;
+}
+
+.app-name {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.app-tagline {
+  font-size: 14px;
+  color: #777;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 15px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+
+.input-file {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.gender-options {
+  display: flex;
+  gap: 25px;
+  margin-top: 5px;
+}
+
+.gender-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #00a884;
+  color: #fff;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+}
+
+.error-msg {
+  padding: 10px;
+  background: #ffdddd;
+  color: #c20000;
+  border-left: 4px solid #c20000;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.success-msg {
+  padding: 10px;
+  background: #ddffdd;
+  color: #007d0a;
+  border-left: 4px solid #007d0a;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.secondary-link {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  text-decoration: none;
+  color: #0077ff;
+}

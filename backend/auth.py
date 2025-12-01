@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
@@ -21,7 +21,7 @@ def verify_password(password: str, hashed: str) -> bool:
 def create_access_token(email: str) -> str:
     payload = {
         "sub": email,
-        "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
         "iat": datetime.utcnow(),
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGO)

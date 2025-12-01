@@ -1,10 +1,12 @@
 from pydantic import BaseModel, EmailStr
-from pydantic import BaseModel, EmailStr
-from datetime import datetime
 
+from datetime import datetime
+from typing import Optional
 from enum import Enum
 
 class UserCreate(BaseModel):
+    full_name:str
+    mobile_no:str
     email: EmailStr
     password: str
 
@@ -23,14 +25,20 @@ class MessageStatus(str, Enum):
     Read = "Read"
 
 class MessageCreate(BaseModel):
-    recipient: EmailStr
+    phone: str
     content: str
 
 class MessageOut(BaseModel):
     id: str
-    sender: EmailStr
-    recipient: EmailStr
+    sender: str
+    contact_id:int
+    sender_saved_name:str
+    recipient: str
     content: str
     timestamp: datetime
     status: MessageStatus
     is_bot_response: bool
+class AddContact(BaseModel):
+ 
+    contact_phone:str
+    saved_name:str
