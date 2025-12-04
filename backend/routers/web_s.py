@@ -3,11 +3,14 @@ from auth import JWT_SECRET, JWT_ALGO
 from core.config import ALGORITHM,SECRET_KEY
 from jose import jwt, JWTError
 from ws_manager import manager
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from database import get_db
 
 router = APIRouter()
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_endpoint(websocket: WebSocket,db:Session=Depends(get_db)):
     token = websocket.query_params.get("token")
     if not token:
         await websocket.close(code=4401)
@@ -23,7 +26,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=4401)
         return
 
-    await manager.connect(phone, websocket)
+    await manager.connect(phone, websocket,db)
     try:
         while True:
             await websocket.receive_text()

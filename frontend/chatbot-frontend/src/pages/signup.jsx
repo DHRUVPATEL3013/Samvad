@@ -19,7 +19,7 @@ export default function Signup({ onSignedUp }) {
 
     try {
       const formData = new FormData();
-      formData.append("name", name);
+      formData.append("fullname", name);
       formData.append("phone", phone);
       formData.append("gender", gender);
       formData.append("dob", dob);
@@ -35,7 +35,7 @@ export default function Signup({ onSignedUp }) {
 
       setTimeout(() => {
         if (onSignedUp) onSignedUp();
-        else window.location.href = "/auth/login";
+        else window.location.href = "/login";
       }, 1500);
     } catch (error) {
       console.error(error);
@@ -50,7 +50,7 @@ export default function Signup({ onSignedUp }) {
       <div className="auth-card">
         <div className="app-brand">
           <div className="app-logo">💬</div>
-          <div className="app-name">WhatsEase</div>
+          <div className="app-name">QuickChat</div>
           <div className="app-tagline">Create your account</div>
         </div>
 

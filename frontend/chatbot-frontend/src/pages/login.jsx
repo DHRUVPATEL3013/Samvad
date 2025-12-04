@@ -92,7 +92,7 @@ export default function Login({ onLoggedIn }) {
       <div className="auth-card">
         <div className="app-brand">
           <div className="app-logo">💬</div>
-          <div className="app-name">WhatsEase</div>
+          <div className="app-name">QuickChat</div>
           <div className="app-tagline">Fast, Secure Messaging</div>
         </div>
 

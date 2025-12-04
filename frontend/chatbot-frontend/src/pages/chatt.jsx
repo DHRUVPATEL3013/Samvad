@@ -15,6 +15,7 @@ function Chatt() {
   
   const [message, setMessage] = useState([])
    const [contacts,setContacts]=useState([])
+   const [msgStatus,setMsgStatus] = useState("")
   
   const [chat, setChat] = useState([])
   const [activeTab, setActiveTab] = useState("chats")
@@ -28,13 +29,45 @@ function Chatt() {
     const socket = new WebSocket(`ws://127.0.0.1:8000/ws?token=${token}`);
     setWs(socket)
     socket.onopen = () => console.log("✅ WebSocket connected");
-    socket.onmessage = (event) => {
+    socket.onmessage = async (event) => {
       const wsData = JSON.parse(event.data)
+    
+      
       if (wsData.type === "message") {
         const newMessage = wsData.data
+        console.log(newMessage.id)
         setMessage((prev) => [...prev, newMessage])
+        // setMsgStatus(wsData.status)
+        if (activeChat === newMessage.sender) {
+      await axios.put(
+        `http://127.0.0.1:8000/messages/read/${newMessage.sender}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    }
         
       }
+       if (wsData.type === "delivered") {
+    const msgID = wsData.id
+
+    setMessage((prev) =>
+      prev.map((msg) =>
+        msg.id === msgID ? { ...msg, status: "delivered" } : msg
+      )
+    )
+  }
+  if (wsData.type === "read") {
+    setMessage(prev =>
+      prev.map(msg =>
+        msg.sender === phone
+          ? { ...msg, status: "read" }
+          : msg
+      )
+    );
+  }
+      
     }
     socket.onclose = () => { console.log("webscoket disconneted") }
     return () => socket.close()
@@ -59,6 +92,13 @@ function Chatt() {
     setMessage(res.data)
     setActiveChat(peers)
     getChats()
+    await axios.put(
+    `http://127.0.0.1:8000/messages/read/${peers}`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   }
 
  
@@ -91,8 +131,8 @@ function Chatt() {
         headers: { Authorization: `Bearer ${token}` }
       }
     )
-    console.log("hello")
-    console.log(res.data)
+    // console.log("hello")
+    // console.log(res.data)
     setChat(res.data)
   }
 
@@ -114,7 +154,7 @@ function Chatt() {
       {/* Sidebar */}
       <div className="sidebar">
         <div className="sidebar-header">
-          <h2>WhatsEase</h2>
+          <h2>QuickChat</h2>
           <p>Fast and secure messaging</p>
           {/* <Profile/> */}
           <div className="profile-pic" onClick={()=>navigate("/profile")}>
@@ -209,7 +249,19 @@ function Chatt() {
                 >
               
                   <div className="message-content">{m.content}</div>
-                  <div className="message-time"><p> </p>{formatTime(m.timestamp)}</div>
+                  {/* <div className="message-time"><p> </p>{formatTime(m.timestamp)}</div> */}
+                  <div className="message-time">
+  {formatTime(m.timestamp)}
+
+  {m.sender === phone && (
+    <span style={{ marginLeft: "6px", fontSize: "12px" }}>
+      {m.status === "sent" && "✓"}
+      {m.status === "delivered" && "✓✓"}
+      {m.status === "read" && <span style={{ color: "dodgerblue" }}>✓✓</span>}
+    </span>
+  )}
+</div>
+
                 </div>
               ))}
             </div>

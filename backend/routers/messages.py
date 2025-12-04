@@ -40,7 +40,7 @@ def serialize_message(msg: Message,db:Session=Depends(get_db)):
         "recipient": msg.recipient.phone if msg.recipient else None,
         "content": msg.content,
         "timestamp": msg.timestamp.isoformat() if msg.timestamp else None,
-        "status": msg.status.value if msg.status else "Sent",
+        "status": msg.status.value if msg.status else "sent",
         "is_bot_response": bool(msg.is_bot_response),
     }
 
@@ -70,12 +70,16 @@ async def send_message(data: MessageCreate, current_user: User = Depends(get_cur
         db.commit()
         db.refresh(new_msg)
 
-        payload = {"type": "message", "data": serialize_message(new_msg,db)}
-        if await manager.is_online(data.phone):
+        
+        if manager.is_online(str(data.phone)):
             try:
-                    await manager.send_personal(data.phone, payload)
+                    
                     new_msg.status = MessageStatus.delivered
                     db.commit()
+                    db.refresh(new_msg) 
+                    payload = {"type": "message", "data": serialize_message(new_msg,db)}
+                    
+                    await manager.send_personal(data.phone, payload)
 
             except Exception as e:
                 print(f"Error sending to recipient {data.phone}: {e}")
@@ -83,12 +87,59 @@ async def send_message(data: MessageCreate, current_user: User = Depends(get_cur
             print("recipient is offline")
 
         try:
-            
+            payload = {"type": "message", "data": serialize_message(new_msg,db)}
             await manager.send_personal(current_user.phone, payload)
+            
+            
         except Exception as e:
             print(f"Error sending to sender {current_user.phone}: {e}")
 
        
+        messages_to_return = [serialize_message(new_msg,db)]
+        return messages_to_return
+
+    except Exception as e:
+        print(f"Unexpected error in send_message: {e}")
+        return []
+
+
+@router.get("/messages/{peer_phone}", response_model=List[MessageOut])
+def get_conversation(peer_phone: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    peer_user=db.query(User).filter(User.phone==peer_phone).first()
+    if not peer_user:
+        return []
+    print(current_user.id)
+    msgs = db.query(Message).filter(
+        ((Message.sender_id == current_user.id) & (Message.recipient_id == peer_user.id)) |
+        ((Message.sender_id == peer_user.id) & (Message.recipient_id == current_user.id))
+    ).order_by(Message.timestamp.asc()).all()
+    return [serialize_message(m,db) for m in msgs]
+
+
+@router.put("/messages/read/{peer_phone}")
+def mark_as_read(
+    peer_phone:str,
+    current_user:User=Depends(get_current_user),
+    db:Session=Depends(get_db)
+):
+    peer=db.query(User).filter(User.phone==peer_phone).first()
+
+    peer_user_msg=db.query(Message).filter(Message.sender_id==peer.id,Message.recipient_id==current_user.id,Message.status!=MessageStatus.read).all()
+    for msg in peer_user_msg:
+        msg.status=MessageStatus.read
+        db.commit()
+
+    if manager.is_online(peer.phone):
+        manager.send_personal(peer.phone,{
+            "type":"read",
+            
+        })
+
+    return "messages readed"
+    
+
+
+
         # bot_msg = None
         # if data.phone == BOT_EMAIL:
         #     try:
@@ -111,30 +162,3 @@ async def send_message(data: MessageCreate, current_user: User = Depends(get_cur
         #             print(f"Error sending bot response: {e}")
         #     except Exception as e:
         #         print(f"Error generating bot response: {e}")
-
-        
-        messages_to_return = [serialize_message(new_msg,db)]
-        # if bot_msg:
-        #     messages_to_return.append(serialize_message(bot_msg,db))
-
-        return messages_to_return
-
-    except Exception as e:
-        print(f"Unexpected error in send_message: {e}")
-        return []
-
-
-@router.get("/messages/{peer_phone}", response_model=List[MessageOut])
-def get_conversation(peer_phone: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    peer_user=db.query(User).filter(User.phone==peer_phone).first()
-    if not peer_user:
-        return []
-    print(current_user.id)
-    msgs = db.query(Message).filter(
-        ((Message.sender_id == current_user.id) & (Message.recipient_id == peer_user.id)) |
-        ((Message.sender_id == peer_user.id) & (Message.recipient_id == current_user.id))
-    ).order_by(Message.timestamp.asc()).all()
-    return [serialize_message(m,db) for m in msgs]
-
-
-

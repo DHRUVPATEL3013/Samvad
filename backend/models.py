@@ -8,9 +8,9 @@ from database import Base
 import enum
 
 class MessageStatus(str, enum.Enum):
-    sent = "Sent"
-    delivered = "Delivered"
-    read = "Read"
+    sent = "sent"
+    delivered = "delivered"
+    read = "read"
 
 class User(Base):
     __tablename__ = "users"

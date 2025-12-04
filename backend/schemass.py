@@ -20,9 +20,9 @@ class TokenOut(BaseModel):
 
 
 class MessageStatus(str, Enum):
-    Sent = "Sent"
-    Delivered = "Delivered"
-    Read = "Read"
+    Sent = "sent"
+    Delivered = "delivered"
+    Read = "read"
 
 class MessageCreate(BaseModel):
     phone: str
