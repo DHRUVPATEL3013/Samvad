@@ -8,6 +8,7 @@ import Profile from "./profile";
 import {  useNavigate } from "react-router-dom";
 import SendMedia from "./SendMedia";
 import ChatInput from "./ChatInput";
+import { API_BASE, WS_BASE } from "../config";
 
 function Chatt() {
   
@@ -36,7 +37,7 @@ const chatEndRef = useRef(null);
 };
 
   useEffect(() => {
-    const socket = new WebSocket(`ws://127.0.0.1:8000/ws?token=${token}`);
+    const socket = new WebSocket(`${WS_BASE}?token=${token}`);
     setWs(socket)
     socket.onopen = () => console.log("✅ WebSocket connected");
     socket.onmessage = async (event) => {
@@ -50,7 +51,7 @@ const chatEndRef = useRef(null);
         // setMsgStatus(wsData.status)
         if (activeChat === newMessage.sender) {
       await axios.put(
-        `http://127.0.0.1:8000/messages/read/${newMessage.sender}`,
+        `${API_BASE}/messages/read/${newMessage.sender}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -85,7 +86,7 @@ const chatEndRef = useRef(null);
 
 
   const getProfileData= async()=>{
-    const res=await axios.get("http://127.0.0.1:8000/get-profile",
+    const res=await axios.get(`${API_BASE}/get-profile`,
             {headers:{Authorization:`Bearer ${token}`}}
         )
     setProfileData(res.data)
@@ -93,7 +94,7 @@ const chatEndRef = useRef(null);
 
 
   const fetchMessage = async (peers) => {
-    const res = await axios.get(`http://127.0.0.1:8000/messages/${peers}`,
+    const res = await axios.get(`${API_BASE}/messages/${peers}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -104,7 +105,7 @@ const chatEndRef = useRef(null);
     getChats()
     
     await axios.put(
-    `http://127.0.0.1:8000/messages/read/${peers}`,
+    `${API_BASE}/messages/read/${peers}`,
     {},
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -119,7 +120,7 @@ const chatEndRef = useRef(null);
  
   
       const fetchContacts=async()=>{
-          const res=await axios.get('http://127.0.0.1:8000/my-contacts',
+          const res=await axios.get(`${API_BASE}/my-contacts`,
               {
                   headers:{Authorization:`Bearer ${token}`}
               }
@@ -129,7 +130,7 @@ const chatEndRef = useRef(null);
       }
       
   const updateName = async (id, newName) => {
-    const res = await axios.put(`http://127.0.0.1:8000/update-contact-name/${id}`, null,
+    const res = await axios.put(`${API_BASE}/update-contact-name/${id}`, null,
       {
         params: {
           new_name: newName
@@ -141,7 +142,7 @@ const chatEndRef = useRef(null);
   }
 
   const getChats = async () => {
-    const res = await axios.get("http://127.0.0.1:8000/chats",
+    const res = await axios.get(`${API_BASE}/chats`,
       {
         headers: { Authorization: `Bearer ${token}` }
       }
@@ -184,7 +185,7 @@ const chatEndRef = useRef(null);
 
           <Profile/> 
           <div className="profile-pic" onClick={()=>navigate("/profile")}>
-            {profileData?.profile_pic?<img src={`http://127.0.0.1:8000/${profileData.profile_pic}`} alt="no image" />:profileData?.fullname?profileData.fullname.charAt(0).toUpperCase():""}
+            {profileData?.profile_pic?<img src={`${API_BASE}/${profileData.profile_pic}`} alt="no image" />:profileData?.fullname?profileData.fullname.charAt(0).toUpperCase():""}
 
             <h3>{profileData.fullname}</h3>
             
@@ -344,7 +345,7 @@ const chatEndRef = useRef(null);
                           <div className="file-message">
                             <span className="file-icon">📎</span>
                             <a 
-                              href={`http://127.0.0.1:8000${m.media_url}`} 
+                              href={`${API_BASE}${m.media_url}`} 
                               download 
                               className="file-link"
                             >
@@ -354,7 +355,7 @@ const chatEndRef = useRef(null);
                         )}
                         {m.content && <div className="media-caption">{m.content}</div>}
                                          <a
-      href={`http://127.0.0.1:8000${m.media_url}`}
+      href={`${API_BASE}${m.media_url}`}
       download
       className="download-btn"
       title="Download"

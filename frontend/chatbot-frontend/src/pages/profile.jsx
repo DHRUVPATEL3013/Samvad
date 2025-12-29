@@ -2,6 +2,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import './profile.css'
+import { API_BASE } from "../config"
 
 function Profile() {
     const [data, setData] = useState()
@@ -18,7 +19,7 @@ function Profile() {
     const token = localStorage.getItem("token")
 
     const getProfile = async () => {
-        const res = await axios.get("http://127.0.0.1:8000/get-profile",
+        const res = await axios.get(`${API_BASE}/get-profile`,
             { headers: { Authorization: `Bearer ${token}` } }
         )
 
@@ -36,7 +37,7 @@ function Profile() {
 
 
         
-        const res = await axios.put(`http://127.0.0.1:8000/update-profile/${data.id}`, formData,
+        const res = await axios.put(`${API_BASE}/update-profile/${data.id}`, formData,
           
             { headers: { Authorization: `Bearer ${token}` } }
         )

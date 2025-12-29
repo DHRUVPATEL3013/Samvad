@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useRef, useState } from "react";
+import { API_BASE } from "../config";
 
 function ChatInput({ token, recipient, getchats }) {
   const [text, setText] = useState("");
@@ -37,14 +38,14 @@ function ChatInput({ token, recipient, getchats }) {
         fd.append("caption", text);
         fd.append("file", file);
 
-        await axios.post("http://127.0.0.1:8000/send-media", fd, {
+        await axios.post(`${API_BASE}/send-media`, fd, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         clearMedia();
       } else if (text.trim()) {
         await axios.post(
-          "http://127.0.0.1:8000/messages",
+          `${API_BASE}/messages`,
           { phone: recipient, content: text },
           { headers: { Authorization: `Bearer ${token}` } }
         );

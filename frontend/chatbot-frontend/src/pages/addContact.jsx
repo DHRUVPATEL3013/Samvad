@@ -1,5 +1,6 @@
 import axios from "axios"
 import { useState } from "react"
+import { API_BASE } from "../config"
 
 function AddContact({token,fetchCont}){
     const [contact,setContact]=useState("")
@@ -7,7 +8,7 @@ function AddContact({token,fetchCont}){
     const [showForm, setShowForm] = useState(false)
     
     const addContact=()=>{
-        axios.post("http://127.0.0.1:8000/add-contact",
+        axios.post(`${API_BASE}/add-contact`,
         {
             contact_phone:contact,
             saved_name:name

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./auth.css";
+import { API_BASE } from "../config";
 
 export default function Signup({ onSignedUp }) {
   const [name, setName] = useState("");
@@ -23,10 +24,10 @@ export default function Signup({ onSignedUp }) {
       formData.append("phone", phone);
       formData.append("gender", gender);
       formData.append("dob", dob);
-      if (file) formData.append("profile", file);
+      if (file) formData.append("profile_pic", file);
 
       const res = await axios.post(
-        "http://127.0.0.1:8000/auth/signup",
+        API_BASE + "/auth/signup",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

@@ -57,6 +57,7 @@
 import { useState } from "react";
 import axios from "axios";
 import "./auth.css";
+import { API_BASE } from "../config";
 
 export default function Login({ onLoggedIn }) {
   const [phone, setPhone] = useState("");
@@ -70,7 +71,7 @@ export default function Login({ onLoggedIn }) {
     setLoading(true);
     
     try {
-      const res = await axios.post("http://127.0.0.1:8000/auth/login", {
+      const res = await axios.post(API_BASE + "/auth/login", {
         phone: phone,
       });
       const token = res.data.access_token || res.data.token;
